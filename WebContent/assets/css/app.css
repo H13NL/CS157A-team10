@@ -558,3 +558,142 @@ p {
   color: #a1a9a1;
   font-size: 15px;
 }
+
+/* Inventory page */
+.flash {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.flash-success {
+  color: var(--green);
+  background: var(--mint);
+}
+.flash-error {
+  color: #a3412c;
+  background: #fbe9e4;
+}
+.inventory-add {
+  margin-bottom: 16px;
+}
+.add-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+.add-form label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 180px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.add-form .add-unit,
+.add-form .add-qty {
+  flex: 0 1 110px;
+}
+.add-or {
+  padding-bottom: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.add-form input,
+.add-form select,
+.qty-form input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cfd8d0;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 14px;
+  background: var(--white);
+}
+.add-form input:focus,
+.add-form select:focus,
+.qty-form input:focus {
+  outline: 2px solid #a8c8af;
+  border-color: var(--green);
+}
+.stock-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid #eef0eb;
+}
+.stock-name {
+  flex: 1 1 160px;
+}
+.stock-name strong {
+  display: block;
+  font-size: 14px;
+}
+.stock-name small {
+  display: block;
+  margin-top: 4px;
+  color: #8a9189;
+  font-size: 11px;
+}
+.stock-row .stock {
+  width: 76px;
+}
+.qty-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.qty-form input {
+  width: 100px;
+  padding: 8px 10px;
+}
+.qty-form .unit {
+  min-width: 48px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.button.small {
+  padding: 8px 14px;
+  font-size: 12px;
+}
+.link-button {
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: #c65b42;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+@media (max-width: 500px) {
+  .add-or {
+    flex-basis: 100%;
+    padding: 0;
+  }
+  .add-form .button {
+    width: 100%;
+  }
+}
+.qty-form .button,
+.add-form .button {
+  margin-top: 0;
+}
+.add-form label,
+.stock-name {
+  min-width: 0;
+}
+@media (max-width: 500px) {
+  .stock-row .stock {
+    width: auto;
+  }
+  .qty-form {
+    flex: 1 1 100%;
+  }
+  .qty-form input {
+    flex: 1;
+    min-width: 0;
+  }
+}

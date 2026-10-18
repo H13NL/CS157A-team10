@@ -12,7 +12,7 @@ public class UserDAO {
     public User findUser(String email, String password) {
     	
     	// sql query for finding login credential in db
-    	String sql = "SELECT name, email FROM Users " + "WHERE email = ? AND password = ?";
+    	String sql = "SELECT user_id, name, email FROM users " + "WHERE email = ? AND password = ?";
     	
     	// change to your database password (I set mine as a environment variable). 
         String dbPassword = System.getenv("WHATS_MENU_DB_PASSWORD");
@@ -32,9 +32,10 @@ public class UserDAO {
                 preparedStatement.setString(2, password);
 
                 try (ResultSet rs = preparedStatement.executeQuery()) {
-                	// if credential match 1 instance in Users table then return their name and email
+                	// if credential match 1 instance in users table then return their id, name and email
                     if (rs.next()) {
                         return new User(
+                                rs.getInt("user_id"),
                                 rs.getString("name"),
                                 rs.getString("email")
                             );
