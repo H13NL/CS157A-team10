@@ -45,3 +45,18 @@ INSERT INTO stock (restaurant_id, ing_id, qty_avai, unit) VALUES
     (2, 7, 4.00, 'heads'),
     (2, 8, 15.00, 'pcs'),
     (2, 9, 750.00, 'ml');
+
+-- Public recipes are browseable by every chef. A chef must save a private copy before editing.
+INSERT INTO recipe (recipe_id, name, description, is_public, created_by) VALUES
+    (1, 'Garden Vegetable Bowl', 'A bright bowl built around crisp vegetables and a simple olive-oil finish.', TRUE, 1),
+    (2, 'Quick Ramen', 'A flexible ramen bowl for using pantry staples on a busy service night.', TRUE, 2);
+
+INSERT INTO requires (recipe_id, ing_id, qty, unit) VALUES
+    (1, 2, 2.00, 'pcs'),
+    (1, 3, 1.00, 'pcs'),
+    (1, 7, 1.00, 'heads'),
+    (1, 9, 30.00, 'ml'),
+    (2, 6, 1.00, 'packs'),
+    (2, 3, 1.00, 'pcs'),
+    (2, 4, 2.00, 'cloves'),
+    (2, 5, 50.00, 'ml');

@@ -2,6 +2,7 @@
 <%@ page import="edu.sjsu.team10.model.User" %>
 <%@ page import="edu.sjsu.team10.model.Restaurant" %>
 <%@ page import="edu.sjsu.team10.model.StockItem" %>
+<%@ page import="edu.sjsu.team10.model.Recipe" %>
 <%@ page import="edu.sjsu.team10.util.Html" %>
 <%@ page import="java.util.List" %>
 
@@ -16,11 +17,12 @@
 <body class="dashboard-page">
 <header class="appbar">
     <a class="brand" href="<%= request.getContextPath() %>/chef-dashboard"><span class="brand-mark">W</span><span>WhatsOnTheMenu</span></a>
-    <nav class="app-nav"><a class="active" href="#overview">Overview</a><a href="<%= request.getContextPath() %>/inventory">Inventory</a><a href="#recipes">Recipes</a><a href="#">Restock</a></nav>
+    <nav class="app-nav"><a class="active" href="#overview">Overview</a><a href="<%= request.getContextPath() %>/inventory">Inventory</a><a href="<%= request.getContextPath() %>/recipes">Recipes</a><a href="#">Restock</a></nav>
     <%
 	    User loggedInUser = (User) session.getAttribute("user");
 	    Restaurant restaurant = (Restaurant) session.getAttribute("restaurant");
 	    List<StockItem> inventory = (List<StockItem>) request.getAttribute("inventory");
+	    List<Recipe> recipes = (List<Recipe>) request.getAttribute("recipes");
 	%>
 	
 	<div class="account-menu"> 	
@@ -84,36 +86,27 @@
         </article>
 
         <article class="panel" id="recipes">
-            <div class="panel-header"><div><p class="eyebrow">RECIPE LIBRARY</p><h2>Tonight's options</h2></div><a href="#">Browse all →</a></div>
+            <div class="panel-header"><div><p class="eyebrow">RECIPE LIBRARY</p><h2>Tonight's options</h2></div><a href="<%= request.getContextPath() %>/recipes">Browse all →</a></div>
             <div class="recipe-list">
-            
-            	<% // these are place holders for the recipe items (it will only list the first 4 items) %>
+	            <% if (recipes == null || recipes.isEmpty()) { %>
                 <div class="recipe-item">
-				    <span class="recipe-icon recipe-placeholder">—</span>
-				    <div>
-				        <strong>Recipe name</strong>
-				        <small>Number of ingredients</small>
-				    </div>
-				    <span class="status">Status</span>
-				</div>
-				<div class="recipe-item">
-				    <span class="recipe-icon recipe-placeholder">—</span>
-				    <div>
-				        <strong>Recipe name</strong>
-				        <small>Number of ingredients</small>
-				    </div>
-				    <span class="status">Status</span>
-				</div>
-				<div class="recipe-item">
-				    <span class="recipe-icon recipe-placeholder">—</span>
-				    <div>
-				        <strong>Recipe name</strong>
-				        <small>Number of ingredients</small>
-				    </div>
-				    <span class="status">Status</span>
-				</div>
+                    <span class="recipe-icon recipe-placeholder">—</span>
+                    <div><strong>No recipes yet</strong><small>Create one in the recipe library</small></div>
+                </div>
+                <% } else { %>
+                    <% for (Recipe recipe : recipes.subList(0, Math.min(3, recipes.size()))) { %>
+                    <a class="recipe-item" href="<%= request.getContextPath() %>/recipes?id=<%= recipe.getRecipeId() %>">
+                        <span class="recipe-icon"><%= recipe.isPublic() ? "◈" : "◆" %></span>
+                        <div>
+                            <strong><%= Html.escape(recipe.getName()) %></strong>
+                            <small><%= recipe.getIngredients().size() %> ingredient<%= recipe.getIngredients().size() == 1 ? "" : "s" %></small>
+                        </div>
+                        <span class="status <%= recipe.getFeasibilityClass() %>"><%= recipe.getFeasibilityLabel() %></span>
+                    </a>
+                    <% } %>
+                <% } %>
             </div>
-            <a class="button secondary full-width" href="#">Create a recipe <span>+</span></a>
+            <a class="button secondary full-width" href="<%= request.getContextPath() %>/recipes">Open recipe library <span>→</span></a>
         </article>
     </section>
 

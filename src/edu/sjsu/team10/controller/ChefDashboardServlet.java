@@ -12,8 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.sjsu.team10.dao.InventoryDAO;
+import edu.sjsu.team10.dao.RecipeDAO;
 import edu.sjsu.team10.model.Restaurant;
+import edu.sjsu.team10.model.Recipe;
 import edu.sjsu.team10.model.StockItem;
+import edu.sjsu.team10.model.User;
 
 @WebServlet("/chef-dashboard")
 public class ChefDashboardServlet extends HttpServlet {
@@ -21,6 +24,7 @@ public class ChefDashboardServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private InventoryDAO inventoryDAO = new InventoryDAO();
+    private RecipeDAO recipeDAO = new RecipeDAO();
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -54,8 +58,13 @@ public class ChefDashboardServlet extends HttpServlet {
 
             request.setAttribute("inventory", inventory);
             request.setAttribute("inStockCount", inStockCount);
+
+            User loggedInUser = (User) session.getAttribute("user");
+            List<Recipe> recipes = recipeDAO.findVisible(
+                    loggedInUser.getUserId(), restaurant.getRestaurantId());
+            request.setAttribute("recipes", recipes);
         } catch (SQLException e) {
-            throw new ServletException("Could not load inventory", e);
+            throw new ServletException("Could not load dashboard data", e);
         }
 
         request.getRequestDispatcher("/WEB-INF/views/chef-dashboard.jsp")

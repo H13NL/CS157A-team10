@@ -37,7 +37,7 @@
 <body class="dashboard-page">
 <header class="appbar">
     <a class="brand" href="<%= request.getContextPath() %>/chef-dashboard"><span class="brand-mark">W</span><span>WhatsOnTheMenu</span></a>
-    <nav class="app-nav"><a href="<%= request.getContextPath() %>/chef-dashboard">Overview</a><a class="active" href="<%= request.getContextPath() %>/inventory">Inventory</a><a href="#">Recipes</a><a href="#">Restock</a></nav>
+    <nav class="app-nav"><a href="<%= request.getContextPath() %>/chef-dashboard">Overview</a><a class="active" href="<%= request.getContextPath() %>/inventory">Inventory</a><a href="<%= request.getContextPath() %>/recipes">Recipes</a><a href="#">Restock</a></nav>
 
 	<div class="account-menu">
 	    <span class="avatar"><%= loggedInUser.getInitials() %></span>
