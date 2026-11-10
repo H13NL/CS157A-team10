@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import edu.sjsu.team10.model.User;
 
@@ -48,5 +49,28 @@ public class UserDAO {
         }
 
         return null;
+    }
+    
+    public boolean isConsumer(int userId) {
+
+        String sql =
+            "SELECT 1 "
+          + "FROM consumer "
+          + "WHERE user_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement preparedStatement =
+                 con.prepareStatement(sql)) {
+
+            preparedStatement.setInt(1, userId);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
