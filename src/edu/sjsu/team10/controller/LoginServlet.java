@@ -38,14 +38,29 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             session.setAttribute("userName", user.getName());
 
-            // the restaurant this chef works at (null if the user isn't a chef)
-            Restaurant restaurant = restaurantDAO.findByChef(user.getUserId());
-            session.setAttribute("restaurant", restaurant);
+            Restaurant restaurant =
+            	    restaurantDAO.findByChef(user.getUserId());
 
-            // For now, all valid users go to the chef dashboard
-            response.sendRedirect(
-                request.getContextPath() + "/chef-dashboard"
-            );
+            	if (restaurant != null) {
+            	    // This user is a chef assigned to a restaurant
+            	    session.setAttribute("restaurant", restaurant);
+
+            	    response.sendRedirect(
+            	        request.getContextPath() + "/chef-dashboard"
+            	    );
+
+            	} else if (userDAO.isConsumer(user.getUserId())) {
+            	    // This user is a consumer
+            	    response.sendRedirect(
+            	        request.getContextPath() + "/consumer-dashboard"
+            	    );
+
+            	} else {
+            	    response.sendError(
+            	        HttpServletResponse.SC_FORBIDDEN,
+            	        "This account has no valid role."
+            	    );
+            	}
         } else {
             response.sendRedirect(
                 request.getContextPath() + "/login.jsp?error=1"
