@@ -43,7 +43,7 @@
         <a class="active" href="#overview">Overview</a>
         <a href="#pantry">My pantry</a>
         <a href="#recipes">Recipes</a>
-        <a href="#orders">Orders</a>
+        <a href="<%= request.getContextPath() %>/orders">Orders</a>
     </nav>
 
     <div class="account-menu">
@@ -169,7 +169,7 @@
             <h2>Need a few more ingredients?</h2>
             <p>Add missing pantry items to a simulated grocery order.</p>
         </div>
-        <a class="button light" href="#orders">Start an order <span>→</span></a>
+        <a class="button light" href="<%= request.getContextPath() %>/orders">Start an order <span>→</span></a>
     </section>
 </main>
 
