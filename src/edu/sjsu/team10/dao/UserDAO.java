@@ -13,7 +13,7 @@ public class UserDAO {
     public User findUser(String email, String password) {
     	
     	// sql query for finding login credential in db
-    	String sql = "SELECT user_id, name, email FROM users " + "WHERE email = ? AND password = ?";
+    	String sql = "SELECT user_id, name, email, status FROM users " + "WHERE email = ? AND password = ?";
     	
     	// change to your database password (I set mine as a environment variable). 
         String dbPassword = System.getenv("WHATS_MENU_DB_PASSWORD");
@@ -38,7 +38,8 @@ public class UserDAO {
                         return new User(
                                 rs.getInt("user_id"),
                                 rs.getString("name"),
-                                rs.getString("email")
+                                rs.getString("email"),
+                                rs.getString("status")
                             );
                     }
                 }
@@ -61,6 +62,35 @@ public class UserDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement preparedStatement =
                  con.prepareStatement(sql)) {
+
+            preparedStatement.setInt(1, userId);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isAdmin(int userId) {
+        return existsIn("SELECT 1 FROM admin WHERE user_id = ?", userId);
+    }
+
+    public boolean isRestocker(int userId) {
+        return existsIn("SELECT 1 FROM restocker WHERE user_id = ?", userId);
+    }
+
+    // a restocker can only log in after an admin has approved them (approved_by is set)
+    public boolean isApprovedRestocker(int userId) {
+        return existsIn("SELECT 1 FROM restocker WHERE user_id = ? AND approved_by IS NOT NULL", userId);
+    }
+
+    private boolean existsIn(String sql, int userId) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement preparedStatement = con.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, userId);
 

@@ -1,0 +1,30 @@
+<%-- One restock request. The including page sets RestockRequest rq, boolean forRestocker,
+     and SimpleDateFormat requestDateFormat inside its loop. --%>
+<article class="request-card">
+    <div class="request-top">
+        <div>
+            <strong>Request #<%= rq.getRequestId() %></strong>
+            <small>
+                <% if (forRestocker) { %>
+                From <%= Html.escape(rq.getChefName()) %> &middot; <%= Html.escape(rq.getRestaurantName()) %>
+                <% } else { %>
+                To <%= Html.escape(rq.getRestockerName()) %>
+                <% } %>
+                <% if (rq.getRecipeName() != null) { %> &middot; for recipe <em><%= Html.escape(rq.getRecipeName()) %></em><% } %>
+            </small>
+        </div>
+        <span class="state-pill <%= Html.escape(rq.getStatus()) %>"><%= Html.escape(rq.getStatus()) %></span>
+    </div>
+    <ul class="request-items">
+        <% for (edu.sjsu.team10.model.RestockRequest.Item it : rq.getItems()) { %>
+        <li>
+            <span><%= Html.escape(it.getName()) %></span>
+            <span><%= it.getQtyDisplay() %> <%= Html.escape(it.getUnit()) %></span>
+        </li>
+        <% } %>
+    </ul>
+    <div class="request-foot">
+        <span>Sent <%= rq.getCreatedAt() == null ? "&mdash;" : requestDateFormat.format(rq.getCreatedAt()) %><%= rq.getRespondedAt() == null ? "" : " &middot; Answered " + requestDateFormat.format(rq.getRespondedAt()) %></span>
+        <span>Est. <%= rq.getEstimatedTotalDisplay() %></span>
+    </div>
+</article>

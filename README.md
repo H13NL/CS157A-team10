@@ -10,10 +10,15 @@
 4. **Run:** in Eclipse, File → Import → *Existing Projects into Workspace* → pick the folder. If needed, add the Tomcat server (Window → Preferences → Server → Runtime Environments → Apache Tomcat v9.0 → point to `apache-tomcat-9.0.100`). Then right-click the project → Run As → *Run on Server*.
 5. **Log in** at `http://localhost:8080/<project-name>/login.jsp` with a sample account (password `pass123`):
 
-| Email | Restaurant |
+| Email | Role |
 |---|---|
-| `chef@test.com` | Team 10 Kitchen |
-| `chef2@test.com` | Team 10 Kitchen (shared stock) |
-| `bistro@test.com` | Spartan Bistro |
+| `chef@test.com` | Chef at Team 10 Kitchen |
+| `chef2@test.com` | Chef at Team 10 Kitchen (shared stock) |
+| `bistro@test.com` | Chef at Spartan Bistro |
+| `admin@test.com` | Administrator (opens `/admin`) |
+| `consumer@test.com` | Consumer |
+| `restocker@test.com` | Restocker (Fresh Farms Supply), approved, opens `/catalog` |
+| `bayfresh@test.com` | Restocker (Bay Fresh Produce), approved |
+| `pending@test.com` | Restocker, waiting for admin approval (can't log in until approved) |
 
 **Troubleshooting:** *Login always fails* → check MySQL is running, step 2 was done, and the password variable is set in the Tomcat launch configuration. *Eclipse shows a missing `mysql-connector` library* → remove the old `C:/Users/...` entry under Build Path; the driver is already in `WebContent/WEB-INF/lib/`.
