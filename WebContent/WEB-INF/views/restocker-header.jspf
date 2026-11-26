@@ -1,0 +1,17 @@
+<%-- Shared restocker app bar. The including page sets String restockerNav to "catalog" or "requests". --%>
+<%
+    edu.sjsu.team10.model.User restockerUser = (edu.sjsu.team10.model.User) session.getAttribute("user");
+    String ctx = request.getContextPath();
+%>
+<header class="appbar">
+    <a class="brand" href="<%= ctx %>/catalog"><span class="brand-mark">W</span><span>WhatsOnTheMenu</span></a>
+    <nav class="app-nav">
+        <a class="<%= "catalog".equals(restockerNav) ? "active" : "" %>" href="<%= ctx %>/catalog">Catalog</a>
+        <a class="<%= "requests".equals(restockerNav) ? "active" : "" %>" href="<%= ctx %>/restocker/requests">Requests</a>
+    </nav>
+    <div class="account-menu">
+        <span class="avatar"><%= restockerUser.getInitials() %></span>
+        <span><%= edu.sjsu.team10.util.Html.escape(restockerUser.getName()) %></span>
+        <a href="<%= ctx %>/login.jsp">Log out</a>
+    </div>
+</header>

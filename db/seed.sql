@@ -15,7 +15,26 @@ INSERT INTO restaurant (restaurant_id, restaurant_name) VALUES
 INSERT INTO users (user_id, name, email, password) VALUES
     (1, 'Test Chef',   'chef@test.com',  'pass123'),
     (2, 'Second Chef', 'chef2@test.com', 'pass123'),
-    (3, 'Bistro Chef', 'bistro@test.com', 'pass123');
+    (3, 'Bistro Chef', 'bistro@test.com', 'pass123'),
+    (4, 'Site Admin', 'admin@test.com', 'pass123'),
+    (5, 'Fresh Farms', 'restocker@test.com', 'pass123'),
+    (6, 'Valley Produce', 'pending@test.com', 'pass123'),
+    (7, 'Test Consumer', 'consumer@test.com', 'pass123'),
+    (8, 'Bay Fresh', 'bayfresh@test.com', 'pass123');
+
+INSERT INTO admin (user_id) VALUES (4);
+
+-- Restocker 5 was approved by admin 4; restocker 6 is still waiting (approved_by is NULL)
+INSERT INTO restocker (user_id, company_name, approved_by, approved_at) VALUES
+    (5, 'Fresh Farms Supply', 4, CURRENT_TIMESTAMP),
+    (6, 'Valley Produce Co.', NULL, NULL),
+    (8, 'Bay Fresh Produce', 4, CURRENT_TIMESTAMP);
+
+INSERT INTO consumer (user_id) VALUES (7);
+
+INSERT INTO audit_log (user_id, action, entity_type, entity_id) VALUES
+    (4, 'APPROVE_RESTOCKER', 'restocker', 5),
+    (4, 'APPROVE_RESTOCKER', 'restocker', 8);
 
 -- Chefs 1 and 2 share Team 10 Kitchen's inventory; chef 3 works at Spartan Bistro
 INSERT INTO chef (user_id, restaurant_id) VALUES
@@ -60,3 +79,26 @@ INSERT INTO requires (recipe_id, ing_id, qty, unit) VALUES
     (2, 3, 1.00, 'pcs'),
     (2, 4, 2.00, 'cloves'),
     (2, 5, 50.00, 'ml');
+
+-- Restocker catalogs (supplies): price per unit and quantity available
+INSERT INTO supplies (restocker_id, ing_id, price, qty) VALUES
+    (5, 2, 0.35, 500.00),
+    (5, 3, 0.60, 200.00),
+    (5, 4, 0.10, 1000.00),
+    (5, 5, 0.02, 20000.00),
+    (5, 6, 1.25, 300.00),
+    (5, 10, 8.50, 40.00),
+    (8, 7, 1.80, 60.00),
+    (8, 8, 0.75, 150.00),
+    (8, 9, 0.03, 10000.00),
+    (8, 3, 0.55, 0.00);
+
+-- Sample restock requests from Test Chef: one simple, one based on the Quick Ramen recipe
+INSERT INTO restock_request (request_id, chef_id, restocker_id, recipe_id, status, created_at, responded_at) VALUES
+    (1, 1, 8, NULL, 'accepted', '2026-11-15 10:30:00', '2026-11-15 14:05:00'),
+    (2, 1, 5, 2, 'pending', '2026-11-20 09:15:00', NULL);
+
+INSERT INTO contain (request_id, ing_id, qty_req) VALUES
+    (1, 7, 4.00),
+    (1, 8, 12.00),
+    (2, 4, 20.00);

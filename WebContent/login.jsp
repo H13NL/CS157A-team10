@@ -31,6 +31,17 @@
         <p class="eyebrow">ACCOUNT LOGIN</p>
         <h2>Log in to your account</h2>
         <p class="form-help">Use the email and password associated with your account.</p>
+<%
+    // set by LoginServlet when a login is refused
+    String loginError = request.getParameter("error");
+    String loginErrorText = null;
+    if ("1".equals(loginError)) { loginErrorText = "Incorrect email or password."; }
+    else if ("disabled".equals(loginError)) { loginErrorText = "This account has been disabled. Contact an administrator."; }
+    else if ("rejected".equals(loginError)) { loginErrorText = "This restocker application was not approved."; }
+    else if ("pending".equals(loginError)) { loginErrorText = "Your restocker account is waiting for administrator approval."; }%>
+        <% if (loginErrorText != null) { %>
+        <p class="flash flash-error"><%= loginErrorText %></p>
+        <% } %>
         <form action="<%= request.getContextPath() %>/login" method="post">
             <label for="email">Email address</label>
             <input id="email" name="email" type="email" placeholder="you@example.com" required>

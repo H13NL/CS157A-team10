@@ -1,0 +1,18 @@
+<%-- Shared admin app bar. The including page sets String adminNav to "overview", "users", or "audit". --%>
+<%
+    edu.sjsu.team10.model.User adminUser = (edu.sjsu.team10.model.User) session.getAttribute("user");
+    String ctx = request.getContextPath();
+%>
+<header class="appbar">
+    <a class="brand" href="<%= ctx %>/admin"><span class="brand-mark">W</span><span>WhatsOnTheMenu</span></a>
+    <nav class="app-nav">
+        <a class="<%= "overview".equals(adminNav) ? "active" : "" %>" href="<%= ctx %>/admin">Overview</a>
+        <a class="<%= "users".equals(adminNav) ? "active" : "" %>" href="<%= ctx %>/admin/users">Users</a>
+        <a class="<%= "audit".equals(adminNav) ? "active" : "" %>" href="<%= ctx %>/admin/audit">Audit log</a>
+    </nav>
+    <div class="account-menu">
+        <span class="avatar"><%= adminUser.getInitials() %></span>
+        <span><%= edu.sjsu.team10.util.Html.escape(adminUser.getName()) %></span>
+        <a href="<%= ctx %>/login.jsp">Log out</a>
+    </div>
+</header>

@@ -759,3 +759,213 @@ p {
 .editor-actions { display: flex; justify-content: flex-end; gap: 10px; }
 @media (max-width: 850px) { .recipe-library-grid { grid-template-columns: repeat(2, 1fr); } .detail-hero, .library-intro { display: block; } .detail-actions, .library-legend { margin-top: 20px; justify-content: flex-start; } .detail-grid { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .recipe-library-grid { grid-template-columns: 1fr; } .ingredient-editor-row { grid-template-columns: 1fr 1fr; } .ingredient-editor-row .remove-ingredient { grid-column: 2; justify-self: end; } .detail-hero h1 { font-size: 36px; } }
+
+/* Admin pages */
+a.metric-card {
+  color: var(--ink);
+  transition: box-shadow .15s ease;
+}
+a.metric-card:hover {
+  box-shadow: 0 8px 20px #29452d12;
+}
+.admin-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid #eef0eb;
+}
+.admin-row-name {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.admin-row-name strong {
+  display: block;
+  font-size: 14px;
+}
+.admin-row-name small {
+  display: block;
+  margin-top: 4px;
+  color: #8a9189;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-actions form {
+  margin: 0;
+}
+.admin-actions .button {
+  margin-top: 0;
+}
+.admin-time {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.admin-clear {
+  padding-bottom: 12px;
+  font-size: 12px;
+}
+.role-pill,
+.state-pill,
+.audit-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.audit-badge {
+  text-transform: none;
+}
+.role-pill {
+  color: #4f79a2;
+  background: #e5eef8;
+}
+.state-pill.active,
+.audit-badge.good {
+  color: var(--green);
+  background: var(--mint);
+}
+.state-pill.pending {
+  color: #a25530;
+  background: #fff0e8;
+}
+.state-pill.disabled,
+.state-pill.rejected,
+.audit-badge.bad {
+  color: #a3412c;
+  background: #fbe9e4;
+}
+.audit-badge.neutral {
+  color: var(--muted);
+  background: #eef0eb;
+}
+.audit-table-wrap {
+  overflow-x: auto;
+}
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.audit-table th {
+  padding: 10px 12px 10px 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.audit-table td {
+  padding: 12px 12px 12px 0;
+  vertical-align: top;
+  border-top: 1px solid #eef0eb;
+}
+.audit-table td strong,
+.audit-table td small {
+  display: block;
+}
+.audit-table td small {
+  margin-top: 3px;
+  color: #8a9189;
+  font-size: 11px;
+}
+
+/* Restock requests and restocker catalog */
+.state-pill.accepted,
+.state-pill.fulfilled {
+  color: var(--green);
+  background: var(--mint);
+}
+.recipe-fill {
+  margin-bottom: 16px;
+}
+.shortfall {
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  background: #fbfaf4;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.shortfall .eyebrow {
+  margin-bottom: 8px;
+}
+.shortfall-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  padding: 8px 0;
+  border-top: 1px solid #eef0eb;
+  font-size: 13px;
+}
+.shortfall-line strong {
+  min-width: 120px;
+}
+.shortfall-line span:not(.status) {
+  flex: 1 1 220px;
+  color: var(--muted);
+}
+.request-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+.request-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.request-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 10px;
+}
+.request-top strong,
+.request-top small {
+  display: block;
+}
+.request-top small {
+  margin-top: 4px;
+  color: #8a9189;
+  font-size: 11px;
+}
+.request-items {
+  flex: 1;
+  margin: 14px 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.request-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid #eef0eb;
+}
+.request-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+@media (max-width: 500px) {
+  .request-list {
+    grid-template-columns: 1fr;
+  }
+}
