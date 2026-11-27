@@ -11,8 +11,7 @@ public class PantryItem {
     private final String unit;
     private final Timestamp lastUpdate;
 
-    public PantryItem(int ingredientId, String name, BigDecimal quantity,
-                      String unit, Timestamp lastUpdate) {
+    public PantryItem(int ingredientId, String name, BigDecimal quantity, String unit, Timestamp lastUpdate) {
         this.ingredientId = ingredientId;
         this.name = name;
         this.quantity = quantity;

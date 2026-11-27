@@ -12,6 +12,9 @@
     <div class="account-menu">
         <span class="avatar"><%= restockerUser.getInitials() %></span>
         <span><%= edu.sjsu.team10.util.Html.escape(restockerUser.getName()) %></span>
+        <a href="<%= request.getContextPath() %>/change-password">
+	        Change password
+	    </a>
         <a href="<%= ctx %>/login.jsp">Log out</a>
     </div>
 </header>

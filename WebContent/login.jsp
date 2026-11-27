@@ -49,6 +49,12 @@
             <label for="password">Password</label>
             <input id="password" name="password" type="password" placeholder="Enter your password" required>
             <button class="button primary full-width" type="submit">Log in <span>→</span></button>
+            <p class="form-help">
+			    Do not have an account?
+			    <a href="<%= request.getContextPath() %>/signup.jsp">
+			        Sign up as a consumer
+			    </a>
+			</p>
         </form>
     </section>
 </main>

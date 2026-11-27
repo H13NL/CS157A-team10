@@ -12,43 +12,49 @@ import edu.sjsu.team10.model.Ingredient;
 import edu.sjsu.team10.model.PantryItem;
 
 public class PantryDAO {
+	
+	public List<PantryItem> findByConsumer(int consumerId) throws SQLException {
 
-    public List<PantryItem> findByConsumer(int consumerId)
-            throws SQLException {
+	    String sql =
+	        "SELECT i.ing_id, i.name, "
+	      + "k.qty_avai, "
+	      + "k.unit AS pantry_unit, "
+	      + "i.unit AS ingredient_unit, "
+	      + "k.last_update "
+	      + "FROM keeps k "
+	      + "JOIN ingredient i ON k.ing_id = i.ing_id "
+	      + "WHERE k.consumer_id = ? "
+	      + "ORDER BY i.name";
 
-        String sql =
-            "SELECT i.ing_id, i.name, k.qty_avai, "
-          + "COALESCE(k.unit, i.unit) AS unit, k.last_update "
-          + "FROM keeps k "
-          + "JOIN ingredient i ON k.ing_id = i.ing_id "
-          + "WHERE k.consumer_id = ? "
-          + "ORDER BY i.name";
+	    List<PantryItem> items = new ArrayList<>();
 
-        List<PantryItem> items = new ArrayList<>();
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+	        ps.setInt(1, consumerId);
 
-            ps.setInt(1, consumerId);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                String unit = rs.getString("pantry_unit");
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    items.add(new PantryItem(
-                        rs.getInt("ing_id"),
-                        rs.getString("name"),
-                        rs.getBigDecimal("qty_avai"),
-                        rs.getString("unit"),
-                        rs.getTimestamp("last_update")
-                    ));
-                }
-            }
-        }
+	                if (unit == null) {
+	                    unit = rs.getString("ingredient_unit");
+	                }
 
-        return items;
-    }
+	                items.add(new PantryItem(
+	                    rs.getInt("ing_id"),
+	                    rs.getString("name"),
+	                    rs.getBigDecimal("qty_avai"),
+	                    unit,
+	                    rs.getTimestamp("last_update")
+	                ));
+	            }
+	        }
+	    }
+	    return items;
+	}
 
-    public List<Ingredient> findNotKept(int consumerId)
-            throws SQLException {
+    public List<Ingredient> findNotKept(int consumerId) throws SQLException {
 
         String sql =
             "SELECT i.ing_id, i.name, i.unit "
@@ -79,9 +85,7 @@ public class PantryDAO {
         return ingredients;
     }
 
-    public boolean updateQuantity(int consumerId, int ingredientId,
-                                  BigDecimal quantity)
-            throws SQLException {
+    public boolean updateQuantity(int consumerId, int ingredientId, BigDecimal quantity) throws SQLException {
 
         String sql =
             "UPDATE keeps SET qty_avai = ?, "
@@ -99,9 +103,7 @@ public class PantryDAO {
         }
     }
 
-    public void addExisting(int consumerId, int ingredientId,
-                            BigDecimal quantity)
-            throws SQLException {
+    public void addExisting(int consumerId, int ingredientId, BigDecimal quantity) throws SQLException {
 
         String sql =
             "INSERT INTO keeps (consumer_id, ing_id, qty_avai, unit) "
@@ -118,12 +120,10 @@ public class PantryDAO {
         }
     }
 
-    public boolean remove(int consumerId, int ingredientId)
-            throws SQLException {
+    public boolean remove(int consumerId, int ingredientId) throws SQLException {
 
-        String sql =
-            "DELETE FROM keeps "
-          + "WHERE consumer_id = ? AND ing_id = ?";
+        String sql = "DELETE FROM keeps "
+        		   + "WHERE consumer_id = ? AND ing_id = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -132,6 +132,76 @@ public class PantryDAO {
             ps.setInt(2, ingredientId);
 
             return ps.executeUpdate() == 1;
+        }
+    }
+    
+    public boolean consumeRecipe(int consumerId, int recipeId) throws SQLException {
+
+        String requirementsSql =
+            "SELECT ing_id, qty "
+          + "FROM requires "
+          + "WHERE recipe_id = ?";
+
+        String decreaseSql =
+            "UPDATE keeps "
+          + "SET qty_avai = qty_avai - ?, "
+          + "last_update = CURRENT_TIMESTAMP "
+          + "WHERE consumer_id = ? "
+          + "AND ing_id = ? "
+          + "AND qty_avai >= ?";
+
+        try (Connection con = DBConnection.getConnection()) {
+
+            con.setAutoCommit(false);
+
+            try {
+                List<Integer> ingredientIds = new ArrayList<>();
+                List<BigDecimal> quantities = new ArrayList<>();
+
+                try (PreparedStatement ps = con.prepareStatement(requirementsSql)) {
+
+                    ps.setInt(1, recipeId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            ingredientIds.add(rs.getInt("ing_id"));
+                            quantities.add(rs.getBigDecimal("qty"));
+                        }
+                    }
+                }
+
+                // The recipe has no ingredients.
+                if (ingredientIds.isEmpty()) {
+                    con.rollback();
+                    return false;
+                }
+
+                for (int i = 0; i < ingredientIds.size(); i++) {
+
+                    BigDecimal requiredQuantity = quantities.get(i);
+                    int ingredientId = ingredientIds.get(i);
+
+                    try (PreparedStatement ps = con.prepareStatement(decreaseSql)) {
+
+                        ps.setBigDecimal(1, requiredQuantity);
+                        ps.setInt(2, consumerId);
+                        ps.setInt(3, ingredientId);
+                        ps.setBigDecimal(4, requiredQuantity);
+
+                        // If zero rows update, the consumer lacks enough stock.
+                        if (ps.executeUpdate() != 1) {
+                            con.rollback();
+                            return false;
+                        }
+                    }
+                }
+                con.commit();
+                return true;
+
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            }
         }
     }
 }

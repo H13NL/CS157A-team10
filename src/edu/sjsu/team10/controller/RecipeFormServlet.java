@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.sjsu.team10.dao.RecipeDAO;
+import edu.sjsu.team10.dao.UserDAO;
 import edu.sjsu.team10.model.Ingredient;
 import edu.sjsu.team10.model.Recipe;
 import edu.sjsu.team10.model.RecipeInput;
@@ -77,7 +78,15 @@ public class RecipeFormServlet extends HttpServlet {
             } else {
                 recipeDAO.update(recipeId, user.getUserId(), name, description, inputs);
             }
-            response.sendRedirect(request.getContextPath() + "/recipes");
+            if (UserDAO.isConsumer(user.getUserId())) {
+                response.sendRedirect(
+                    request.getContextPath() + "/consumer-recipes"
+                );
+            } else {
+                response.sendRedirect(
+                    request.getContextPath() + "/recipes"
+                );
+            }
         } catch (SQLException e) {
             throw new ServletException("Could not save recipe", e);
         }

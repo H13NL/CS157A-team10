@@ -7,26 +7,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import edu.sjsu.team10.model.User;
-
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 public class UserDAO {
 
     public User findUser(String email, String password) {
     	
     	// sql query for finding login credential in db
     	String sql = "SELECT user_id, name, email, status FROM users " + "WHERE email = ? AND password = ?";
-    	
-    	// change to your database password (I set mine as a environment variable). 
-        String dbPassword = System.getenv("WHATS_MENU_DB_PASSWORD");
-        
-        // change testproject into your database name
-        String url = "jdbc:mysql://localhost:3306/testproject" + "?useSSL=false" + "&allowPublicKeyRetrieval=true" + "&serverTimezone=UTC";
+
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            try (Connection con = DriverManager.getConnection(url,"root",dbPassword);
-
-                PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            try (Connection con = DBConnection.getConnection();
+                    PreparedStatement preparedStatement =
+                        con.prepareStatement(sql)) {
             	
             	// replace ? placeholder with actual email and password
                 preparedStatement.setString(1, email);
@@ -52,7 +48,7 @@ public class UserDAO {
         return null;
     }
     
-    public boolean isConsumer(int userId) {
+    public static boolean isConsumer(int userId) {
 
         String sql =
             "SELECT 1 "
@@ -103,4 +99,77 @@ public class UserDAO {
             return false;
         }
     }
+    
+    // sign up for consumer (doesn't require approval)
+    public void createConsumer(String name,
+            String email,
+            String password)
+		throws SQLException {
+		
+		String userSql =
+		"INSERT INTO users (name, email, password, status) "
+		+ "VALUES (?, ?, ?, 'active')";
+		
+		String consumerSql =
+		"INSERT INTO consumer (user_id) VALUES (?)";
+		
+		try (Connection con = DBConnection.getConnection()) {
+		
+		con.setAutoCommit(false);
+			try {
+				int userId;
+				
+				try (PreparedStatement userStatement = con.prepareStatement( userSql, Statement.RETURN_GENERATED_KEYS)) {
+				
+				 userStatement.setString(1, name);
+				 userStatement.setString(2, email);
+				 userStatement.setString(3, password);
+				
+				 userStatement.executeUpdate();
+				
+					 try (ResultSet keys = userStatement.getGeneratedKeys()) {
+					     if (!keys.next()) {
+					         throw new SQLException(
+					             "Could not retrieve generated user ID."
+					         );
+					     }
+					     userId = keys.getInt(1);
+					 }
+				}
+		
+				try (PreparedStatement consumerStatement =
+				     con.prepareStatement(consumerSql)) {
+				
+					consumerStatement.setInt(1, userId);
+					consumerStatement.executeUpdate();
+				}
+				
+				con.commit();
+		
+			} catch (SQLException e) {
+				con.rollback();
+				throw e;
+			}
+		}
+	}
+    public boolean changePassword(int userId,
+            String currentPassword,
+            String newPassword)
+	throws SQLException {
+	
+		String sql =
+		"UPDATE users "
+		+ "SET password = ? "
+		+ "WHERE user_id = ? AND password = ?";
+		
+		try (Connection con = DBConnection.getConnection();
+		PreparedStatement ps = con.prepareStatement(sql)) {
+		
+			ps.setString(1, newPassword);
+			ps.setInt(2, userId);
+			ps.setString(3, currentPassword);
+			
+			return ps.executeUpdate() == 1;
+		}
+	}
 }

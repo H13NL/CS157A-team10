@@ -13,6 +13,9 @@
     <div class="account-menu">
         <span class="avatar"><%= adminUser.getInitials() %></span>
         <span><%= edu.sjsu.team10.util.Html.escape(adminUser.getName()) %></span>
+        <a href="<%= request.getContextPath() %>/change-password">
+	        Change password
+	    </a>
         <a href="<%= ctx %>/login.jsp">Log out</a>
     </div>
 </header>

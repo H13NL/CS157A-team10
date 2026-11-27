@@ -148,8 +148,7 @@ public class PantryServlet extends HttpServlet {
 
     private BigDecimal parseQuantity(String value) {
         try {
-            BigDecimal quantity = new BigDecimal(value.trim())
-                .setScale(2, RoundingMode.HALF_UP);
+            BigDecimal quantity = new BigDecimal(value.trim()).setScale(2, RoundingMode.HALF_UP);
 
             if (quantity.signum() < 0
                 || quantity.compareTo(MAX_QTY) > 0) {

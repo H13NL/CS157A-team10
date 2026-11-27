@@ -33,7 +33,9 @@
 	    <span>
 	        <%= loggedInUser != null ? Html.escape(loggedInUser.getName()) : "Guest" %>
 	    </span>
-	
+		<a href="<%= request.getContextPath() %>/change-password">
+	        Change password
+	    </a>
 	    <a href="<%= request.getContextPath() %>/login.jsp">Log out</a>
 	</div>
 </header>
