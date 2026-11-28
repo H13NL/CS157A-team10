@@ -714,12 +714,15 @@ p {
 .public-dot { background: var(--orange); }
 .private-dot { background: var(--green); }
 .recipe-library-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.recipe-tile { display: block; min-height: 220px; padding: 23px; color: var(--ink); background: var(--white); border: 1px solid var(--line); border-radius: 13px; transition: transform .15s ease, box-shadow .15s ease; }
+.recipe-tile { display: flex; flex-direction: column; min-height: 220px; padding: 23px; color: var(--ink); background: var(--white); border: 1px solid var(--line); border-radius: 13px; transition: transform .15s ease, box-shadow .15s ease; }
 .recipe-tile:hover { transform: translateY(-2px); box-shadow: 0 12px 26px #29452d12; }
+.recipe-tile-link { display: block; flex: 1; color: inherit; text-decoration: none; }
 .tile-top, .tile-footer, .detail-kicker { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .recipe-tile h2 { margin: 24px 0 8px; font-family: Georgia, serif; font-size: 25px; }
 .tile-meta, .detail-owner { color: var(--muted); font-size: 12px; }
 .tile-footer { margin-top: 34px; padding-top: 15px; border-top: 1px solid #eef0eb; }
+.recipe-make-form { margin-top: 16px; }
+.recipe-make-form .button { width: 100%; }
 .tile-arrow { color: var(--green); font-size: 20px; }
 .visibility-pill { display: inline-block; padding: 6px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .4px; }
 .visibility-pill.public { color: #a25530; background: #fff0e8; }
@@ -733,6 +736,7 @@ p {
 .detail-hero p { max-width: 680px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; white-space: pre-line; }
 .detail-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 .detail-actions form { margin: 0; }
+.detail-actions .recipe-action-button { width: 138px; text-align: center; }
 .detail-grid { display: grid; grid-template-columns: 1.45fr .75fr; gap: 16px; }
 .detail-ingredients { display: grid; gap: 0; }
 .detail-ingredient { display: flex; align-items: center; gap: 12px; padding: 15px 0; border-top: 1px solid #eef0eb; }

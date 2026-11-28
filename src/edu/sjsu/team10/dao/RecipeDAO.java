@@ -16,6 +16,12 @@ import edu.sjsu.team10.model.RecipeInput;
 
 public class RecipeDAO {
 
+    public enum MakeResult {
+        MADE,
+        NOT_MAKEABLE,
+        NOT_FOUND
+    }
+
     public List<Recipe> findVisible(int userId, int restaurantId) throws SQLException {
         String sql = "SELECT r.recipe_id, r.name, r.description, r.is_public, "
                    + "r.created_by, r.created_at, u.name AS creator_name "
@@ -150,6 +156,62 @@ public class RecipeDAO {
                 if (deleted != 1) throw new SQLException("Recipe could not be deleted");
                 con.commit();
                 return true;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public MakeResult make(int recipeId, int userId, int restaurantId) throws SQLException {
+        try (Connection con = DBConnection.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                String visibleSql = "SELECT COUNT(req.ing_id) AS ingredient_count "
+                                  + "FROM recipe r "
+                                  + "LEFT JOIN requires req ON req.recipe_id = r.recipe_id "
+                                  + "WHERE r.recipe_id = ? AND (r.is_public = TRUE OR r.created_by = ?) "
+                                  + "GROUP BY r.recipe_id";
+                int ingredientCount;
+                try (PreparedStatement ps = con.prepareStatement(visibleSql)) {
+                    ps.setInt(1, recipeId);
+                    ps.setInt(2, userId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) {
+                            con.rollback();
+                            return MakeResult.NOT_FOUND;
+                        }
+                        ingredientCount = rs.getInt("ingredient_count");
+                    }
+                }
+
+                if (ingredientCount == 0) {
+                    con.rollback();
+                    return MakeResult.NOT_MAKEABLE;
+                }
+
+                String deductSql = "UPDATE stock s "
+                                 + "JOIN requires req ON req.ing_id = s.ing_id "
+                                 + "SET s.qty_avai = s.qty_avai - req.qty, "
+                                 + "s.last_update = CURRENT_TIMESTAMP "
+                                 + "WHERE s.restaurant_id = ? AND req.recipe_id = ? "
+                                 + "AND s.qty_avai >= req.qty "
+                                 + "AND COALESCE(req.unit, '') <> '' "
+                                 + "AND LOWER(COALESCE(s.unit, '')) = LOWER(COALESCE(req.unit, ''))";
+                int deducted;
+                try (PreparedStatement ps = con.prepareStatement(deductSql)) {
+                    ps.setInt(1, restaurantId);
+                    ps.setInt(2, recipeId);
+                    deducted = ps.executeUpdate();
+                }
+
+                if (deducted != ingredientCount) {
+                    con.rollback();
+                    return MakeResult.NOT_MAKEABLE;
+                }
+
+                con.commit();
+                return MakeResult.MADE;
             } catch (SQLException e) {
                 con.rollback();
                 throw e;
