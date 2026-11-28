@@ -1,0 +1,45 @@
+package edu.sjsu.team10.controller;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import edu.sjsu.team10.dao.RecipeDAO;
+import edu.sjsu.team10.model.User;
+import edu.sjsu.team10.util.RoleGuard;
+
+@WebServlet("/recipe-delete")
+public class RecipeDeleteServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private final RecipeDAO recipeDAO = new RecipeDAO();
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        User user = RoleGuard.require(request, response, "chef");
+        if (user == null) return;
+
+        int recipeId;
+        try {
+            recipeId = Integer.parseInt(request.getParameter("recipeId"));
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid recipe.");
+            return;
+        }
+
+        try {
+            if (!recipeDAO.deleteOwned(recipeId, user.getUserId())) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Recipe not found.");
+                return;
+            }
+            response.sendRedirect(request.getContextPath() + "/recipes?msg=deleted");
+        } catch (SQLException e) {
+            throw new ServletException("Could not delete recipe", e);
+        }
+    }
+}

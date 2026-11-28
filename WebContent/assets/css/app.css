@@ -94,6 +94,11 @@ p {
   color: var(--green);
   background: white;
 }
+.danger {
+  color: white;
+  border: 1px solid #b94f39;
+  background: #c65b42;
+}
 .full-width {
   display: block;
   width: 100%;
@@ -753,10 +758,27 @@ p {
 .editor-basics input:focus, .editor-basics textarea:focus, .ingredient-editor-row input:focus, .ingredient-editor-row select:focus { outline: 2px solid #a8c8af; border-color: var(--green); }
 .private-note { margin: 20px 0 0; padding: 12px 14px; color: var(--green); background: var(--mint); border-radius: 8px; font-size: 12px; }
 .private-note span { margin-right: 7px; }
+.visibility-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 20px 0 0; padding: 0; border: 0; }
+.visibility-options legend { margin-bottom: 8px; font-size: 12px; font-weight: 700; }
+.editor-basics .visibility-choice { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 14px; border: 1px solid #cfd8d0; border-radius: 8px; cursor: pointer; }
+.editor-basics .visibility-choice:has(input:checked) { border-color: var(--green); background: var(--mint); }
+.editor-basics .visibility-choice input { width: auto; margin: 3px 0 0; accent-color: var(--green); }
+.visibility-choice span { display: grid; gap: 3px; }
+.visibility-choice small { color: var(--muted); font-weight: 400; line-height: 1.4; }
 .editor-ingredients .form-help { margin-bottom: 20px; }
 .ingredient-editor-row { display: grid; grid-template-columns: 1.1fr 1.1fr .65fr .65fr 28px; gap: 9px; align-items: center; margin-top: 10px; }
 .remove-ingredient { border: 0; color: #c65b42; background: transparent; font-size: 23px; cursor: pointer; }
 .editor-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.editor-actions .delete-recipe { margin-right: auto; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(20, 31, 24, .55); }
+.modal-backdrop[hidden] { display: none; }
+.confirmation-modal { width: min(100%, 460px); padding: 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); box-shadow: 0 24px 70px rgba(20, 31, 24, .28); }
+.confirmation-modal .modal-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 18px; border-radius: 50%; color: white; background: #c65b42; font-size: 22px; font-weight: 700; }
+.confirmation-modal h2 { margin: 0 0 10px; font-family: Georgia, serif; font-size: 28px; }
+.confirmation-modal > p:not(.eyebrow) { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; }
+.modal-actions form { margin: 0; }
+@media (max-width: 600px) { .visibility-options { grid-template-columns: 1fr; } }
 @media (max-width: 850px) { .recipe-library-grid { grid-template-columns: repeat(2, 1fr); } .detail-hero, .library-intro { display: block; } .detail-actions, .library-legend { margin-top: 20px; justify-content: flex-start; } .detail-grid { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .recipe-library-grid { grid-template-columns: 1fr; } .ingredient-editor-row { grid-template-columns: 1fr 1fr; } .ingredient-editor-row .remove-ingredient { grid-column: 2; justify-self: end; } .detail-hero h1 { font-size: 36px; } }
 

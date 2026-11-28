@@ -31,7 +31,7 @@
     <nav class="app-nav">
         <a href="<%= request.getContextPath() %>/consumer-dashboard">Overview</a>
         <a class="active" href="<%= request.getContextPath() %>/pantry">My pantry</a>
-        <a href="#">Recipes</a>
+        <a href="<%= request.getContextPath() %>/recipes">Recipes</a>
         <a href="<%= request.getContextPath() %>/orders">Orders</a>
     </nav>
     <div class="account-menu">

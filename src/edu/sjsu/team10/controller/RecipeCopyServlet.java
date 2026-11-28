@@ -8,10 +8,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import edu.sjsu.team10.dao.RecipeDAO;
 import edu.sjsu.team10.model.User;
+import edu.sjsu.team10.util.RoleGuard;
 
 @WebServlet("/recipe-copy")
 public class RecipeCopyServlet extends HttpServlet {
@@ -21,9 +21,8 @@ public class RecipeCopyServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User user = session == null ? null : (User) session.getAttribute("user");
-        if (user == null) { response.sendRedirect(request.getContextPath() + "/login.jsp"); return; }
+        User user = RoleGuard.require(request, response, "chef");
+        if (user == null) return;
         try {
             int recipeId = Integer.parseInt(request.getParameter("recipeId"));
             int copyId = recipeDAO.copyPrivate(recipeId, user.getUserId());

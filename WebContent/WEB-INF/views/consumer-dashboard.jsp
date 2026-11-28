@@ -42,7 +42,7 @@
     <nav class="app-nav">
         <a class="active" href="#overview">Overview</a>
         <a href="#pantry">My pantry</a>
-        <a href="#recipes">Recipes</a>
+        <a href="<%= request.getContextPath() %>/recipes">Recipes</a>
         <a href="<%= request.getContextPath() %>/orders">Orders</a>
     </nav>
 
@@ -138,7 +138,7 @@
                     <p class="eyebrow">RECIPE LIBRARY</p>
                     <h2>What can I make?</h2>
                 </div>
-                <a href="#recipes">Browse all →</a>
+                <a href="<%= request.getContextPath() %>/recipes">Browse all →</a>
             </div>
 
             <div class="recipe-list">
@@ -159,7 +159,7 @@
                 </div>
             </div>
 
-            <a class="button secondary full-width" href="#recipes">Explore recipes <span>→</span></a>
+            <a class="button secondary full-width" href="<%= request.getContextPath() %>/recipes">Explore recipes <span>→</span></a>
         </article>
     </section>
 

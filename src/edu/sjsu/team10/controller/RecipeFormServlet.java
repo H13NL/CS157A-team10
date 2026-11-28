@@ -13,13 +13,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import edu.sjsu.team10.dao.RecipeDAO;
 import edu.sjsu.team10.model.Ingredient;
 import edu.sjsu.team10.model.Recipe;
 import edu.sjsu.team10.model.RecipeInput;
 import edu.sjsu.team10.model.User;
+import edu.sjsu.team10.util.RoleGuard;
 
 @WebServlet("/recipe-form")
 public class RecipeFormServlet extends HttpServlet {
@@ -35,7 +35,7 @@ public class RecipeFormServlet extends HttpServlet {
             Integer recipeId = parseId(request.getParameter("id"));
             Recipe recipe = recipeId == null ? null : recipeDAO.findById(recipeId, restaurantId(request));
             if (recipe != null && !recipe.isOwnedBy(user.getUserId())) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only your private recipes can be edited.");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only recipes you created can be edited.");
                 return;
             }
             request.setAttribute("recipe", recipe);
@@ -54,18 +54,32 @@ public class RecipeFormServlet extends HttpServlet {
 
         String name = trim(request.getParameter("name"));
         String description = trim(request.getParameter("description"));
+        String visibility = trim(request.getParameter("visibility"));
+        boolean isPublic = "public".equals(visibility);
         Integer recipeId = parseId(request.getParameter("recipeId"));
         List<RecipeInput> inputs = new ArrayList<>();
         String error = validateInputs(request, inputs);
 
         if (name.isEmpty() || name.length() > 150) error = "Give the recipe a name up to 150 characters.";
         if (description.length() > 4000) error = "Keep the description under 4,000 characters.";
-        if (recipeId != null && !canEdit(user, recipeId, request)) error = "Only your private recipes can be edited.";
+        if (!"private".equals(visibility) && !"public".equals(visibility)) error = "Choose public or private visibility.";
+        if (recipeId != null && !canEdit(user, recipeId, request)) error = "Only recipes you created can be edited.";
 
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("formName", name);
             request.setAttribute("formDescription", description);
+            request.setAttribute("formVisibility", visibility);
+            if (recipeId != null) {
+                try {
+                    Recipe formRecipe = recipeDAO.findById(recipeId, restaurantId(request));
+                    if (formRecipe != null && formRecipe.isOwnedBy(user.getUserId())) {
+                        request.setAttribute("recipe", formRecipe);
+                    }
+                } catch (SQLException e) {
+                    throw new ServletException("Could not reload recipe form", e);
+                }
+            }
             request.setAttribute("ingredients", safeIngredients());
             request.getRequestDispatcher("/WEB-INF/views/recipe-form.jsp").forward(request, response);
             return;
@@ -73,9 +87,9 @@ public class RecipeFormServlet extends HttpServlet {
 
         try {
             if (recipeId == null) {
-                recipeDAO.create(user.getUserId(), name, description, inputs);
+                recipeDAO.create(user.getUserId(), name, description, isPublic, inputs);
             } else {
-                recipeDAO.update(recipeId, user.getUserId(), name, description, inputs);
+                recipeDAO.update(recipeId, user.getUserId(), name, description, isPublic, inputs);
             }
             response.sendRedirect(request.getContextPath() + "/recipes");
         } catch (SQLException e) {
@@ -124,10 +138,7 @@ public class RecipeFormServlet extends HttpServlet {
     }
 
     private User loggedInUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        User user = session == null ? null : (User) session.getAttribute("user");
-        if (user == null) response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return user;
+        return RoleGuard.require(request, response, "chef");
     }
 
     private int restaurantId(HttpServletRequest request) throws ServletException {

@@ -31,27 +31,37 @@ public class RecipeServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
-        if (restaurant == null) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only chefs can view recipes.");
+        String role = (String) session.getAttribute("role");
+        boolean isChef = "chef".equals(role);
+        boolean isConsumer = "consumer".equals(role);
+        if (!isChef && !isConsumer) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    "Recipes are available to chef and consumer accounts.");
             return;
         }
 
         try {
             Integer recipeId = parseId(request.getParameter("id"));
             if (recipeId == null) {
-                List<Recipe> recipes = recipeDAO.findVisible(user.getUserId(), restaurant.getRestaurantId());
+                List<Recipe> recipes = isChef
+                        ? recipeDAO.findVisible(user.getUserId(), restaurant.getRestaurantId())
+                        : recipeDAO.findPublicForConsumer(user.getUserId());
                 request.setAttribute("recipes", recipes);
                 request.getRequestDispatcher("/WEB-INF/views/recipe-library.jsp").forward(request, response);
                 return;
             }
 
-            Recipe recipe = recipeDAO.findById(recipeId, restaurant.getRestaurantId());
+            Recipe recipe = isChef
+                    ? recipeDAO.findById(recipeId, restaurant.getRestaurantId())
+                    : recipeDAO.findPublicByIdForConsumer(recipeId, user.getUserId());
             if (recipe == null || (!recipe.isPublic() && recipe.getCreatedBy() != user.getUserId())) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Recipe not found.");
                 return;
             }
             request.setAttribute("recipe", recipe);
-            request.setAttribute("canEdit", recipe.isOwnedBy(user.getUserId()));
+            request.setAttribute("canEdit", isChef && recipe.isOwnedBy(user.getUserId()));
+            request.setAttribute("canCopy", isChef && recipe.isPublic()
+                    && !recipe.isOwnedBy(user.getUserId()));
             request.getRequestDispatcher("/WEB-INF/views/recipe-detail.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException("Could not load recipes", e);

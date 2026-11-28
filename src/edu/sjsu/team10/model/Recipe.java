@@ -62,6 +62,6 @@ public class Recipe {
     }
 
     public boolean isOwnedBy(int userId) {
-        return !isPublic && createdBy == userId;
+        return createdBy == userId;
     }
 }
